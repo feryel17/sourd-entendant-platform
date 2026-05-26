@@ -1,0 +1,14 @@
+{
+  "name": "sourd-entendant-platform",
+  "version": "1.0.0",
+  "description": "Prototype de communication temps reel sourd/entendant avec simulation de lunettes intelligentes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}

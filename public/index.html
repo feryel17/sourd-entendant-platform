@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pont de Communication - Projet PFA</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 1rem;">
+      <span style="font-size: 3rem;">🤟</span>
+    </div>
+    
+    <h1>Pont de Communication</h1>
+    <p>Cette plateforme fait le lien en temps réel entre vos lunettes intelligentes (reconnaissance de signes) et l'application mobile de votre interlocuteur (reconnaissance vocale).</p>
+
+    <div class="glass-onboarding">
+      <h2 style="font-size: 1.1rem; text-align: center; margin-bottom: 0.5rem;">Comment ça marche ?</h2>
+      <div style="text-align: left; font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.5rem;">
+        <div>⚡ <strong>1. Lancez la session</strong> en cliquant sur le bouton ci-dessous.</div>
+        <div>📸 <strong>2. Présentez le QR Code</strong> généré à votre interlocuteur entendant.</div>
+        <div>👓 <strong>3. Allumez vos lunettes</strong> pour connecter le capteur de gestes.</div>
+        <div>💬 <strong>4. Communiquez</strong> instantanément grâce au chat partagé !</div>
+      </div>
+    </div>
+
+    <button id="btn-start" class="btn-primary">
+      Créer une session unique
+    </button>
+  </div>
+
+  <script>
+    document.getElementById('btn-start').onclick = async () => {
+      try {
+        const response = await fetch('/api/session/create', { method: 'POST' });
+        const data = await response.json();
+        if (data.success && data.sessionId) {
+          // Redirect A to the deaf dashboard with the generated session ID
+          window.location.href = `/deaf.html?session=${data.sessionId}`;
+        } else {
+          alert('Impossible de générer une session. Veuillez réessayer.');
+        }
+      } catch (error) {
+        console.error('Error creating session:', error);
+        alert('Erreur de connexion au serveur.');
+      }
+    };
+  </script>
+
+</body>
+</html>

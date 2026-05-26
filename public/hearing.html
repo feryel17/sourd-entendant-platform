@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Espace Entendant - Pont de Communication</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Client-side Socket.IO library -->
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.3rem; color: var(--accent-violet);">🗣 Espace Entendant</h2>
+      <a href="/" style="color: var(--accent-rose); font-size: 0.85rem; text-decoration: none;">Quitter</a>
+    </div>
+
+    <!-- Onboarding Step: Ask to join and put on glasses -->
+    <div id="hearing-onboarding" class="glass-onboarding">
+      <div class="glass-hud-icon">
+        HUD ON
+      </div>
+      <p style="font-size: 0.9rem; font-weight: 500; text-align: center;">
+        Vous allez communiquer avec une personne sourde.
+      </p>
+      <p style="font-size: 0.8rem; color: var(--text-muted); text-align: center;">
+        Veuillez <strong>porter les lunettes intelligentes</strong> fournies par votre interlocuteur. Elles vous permettront de voir la traduction de ses gestes.
+      </p>
+      
+      <button id="btn-join" class="btn-primary" style="background: linear-gradient(135deg, var(--accent-violet) 0%, #4f46e5 100%);">
+        Rejoindre la conversation
+      </button>
+    </div>
+
+    <!-- Communication Hub (Hidden initially, shown after Join) -->
+    <div id="comm-hub" style="display: none; flex-direction: column; gap: 1.2rem;">
+      <!-- Status bar -->
+      <div class="status-bar">
+        <span>Session active :</span>
+        <span style="display: flex; align-items: center;">
+          <span id="status-indicator" class="status-dot active"></span>
+          <span id="status-text">Connecté à l'interlocuteur</span>
+        </span>
+      </div>
+
+      <!-- Real-time chat box -->
+      <div id="chat-box" class="chat-container" style="height: 250px;">
+        <div class="message-system">
+          Vous avez rejoint le chat. Appuyez sur le micro ci-dessous pour parler.
+        </div>
+      </div>
+
+      <!-- Speech Input Control Section -->
+      <div class="mic-section">
+        <p style="font-size: 0.85rem; color: var(--text-muted); text-align: center;" id="mic-hint">
+          Appuyez sur le micro pour commencer à parler
+        </p>
+        
+        <div class="mic-btn-wrapper">
+          <button id="btn-mic" class="mic-btn">
+            🎙
+          </button>
+          <div class="ripple"></div>
+        </div>
+
+        <div id="live-transcript" class="live-transcript">
+          Votre parole apparaîtra ici en temps réel...
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/hearing.js"></script>
+</body>
+</html>

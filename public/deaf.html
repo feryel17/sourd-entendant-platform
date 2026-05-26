@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau Sourd - Pont de Communication</title>
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Client-side Socket.IO and QR Code libraries -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="font-size: 1.3rem;">🤟 Mon Espace Sourd</h2>
+      <a href="/" style="color: var(--accent-rose); font-size: 0.85rem; text-decoration: none;">Quitter</a>
+    </div>
+
+    <!-- Step 1: Show QR code for B to scan -->
+    <div id="onboarding-qr" class="qr-container">
+      <p style="font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; text-align: center;">
+        Faites scanner ce code à votre interlocuteur :
+      </p>
+      <div id="qrcode"></div>
+      <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem;">
+        ID Session: <span id="session-code" class="session-badge">------</span>
+      </div>
+    </div>
+
+    <!-- Status indicator bar -->
+    <div class="status-bar">
+      <span>Statut de la session :</span>
+      <span style="display: flex; align-items: center;">
+        <span id="status-indicator" class="status-dot"></span>
+        <span id="status-text">Attente de l'entendant...</span>
+      </span>
+    </div>
+
+    <!-- Real-time chat box -->
+    <div id="chat-box" class="chat-container">
+      <div class="message-system">
+        Montrez le QR Code ci-dessus pour démarrer. Les messages s'afficheront ici en temps réel.
+      </div>
+    </div>
+
+    <!-- Simulator: Smart Glasses simulation controls -->
+    <div class="simulator-panel">
+      <h2 style="font-size: 1rem; color: var(--accent-cyan);">👓 Simulateur de Lunettes (Geste → Texte)</h2>
+      <p style="font-size: 0.8rem; text-align: left; margin-bottom: 0.5rem;">
+        Cliquez sur un bouton pour simuler un geste détecté par la caméra de vos lunettes connectées :
+      </p>
+      
+      <div class="gesture-grid">
+        <button class="btn-gesture" data-text="Bonjour !">👋 Bonjour</button>
+        <button class="btn-gesture" data-text="Merci">🙏 Merci</button>
+        <button class="btn-gesture" data-text="Comment ça va ?">❓ Ça va ?</button>
+        <button class="btn-gesture" data-text="Oui">✔️ Oui</button>
+        <button class="btn-gesture" data-text="Non">❌ Non</button>
+        <button class="btn-gesture" data-text="J'ai besoin d'aide">🚨 Aide</button>
+      </div>
+
+      <div class="gesture-input-group">
+        <input type="text" id="custom-gesture" placeholder="Simuler un autre mot/signe...">
+        <button id="btn-send-custom-gesture" class="btn-primary" style="padding: 0.5rem 1rem; width: auto; border-radius: 10px;">
+          Envoyer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/deaf.js"></script>
+</body>
+</html>
