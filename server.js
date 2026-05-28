@@ -12,44 +12,60 @@ const io = new Server(server, {
   }
 });
 
-// Serve static frontend files from 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Fallback API route to generate a dynamic session code
+// Session active mémorisée
+let activeSession = null;
+
+// Crée une nouvelle session
 app.post('/api/session/create', (req, res) => {
-  const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase(); // e.g. 'A7K9X2'
+  const sessionId = Math.random().toString(36).substring(2, 8).toUpperCase();
+  activeSession = sessionId;
+  console.log(`[Session] Nouvelle session créée : ${sessionId}`);
   res.json({ success: true, sessionId });
 });
 
-// WebSocket Event Handling
+// Récupère la session active (utilisé par le Pi)
+app.get('/api/session/active', (req, res) => {
+  if (activeSession) {
+    console.log(`[Session] Pi récupère la session active : ${activeSession}`);
+    res.json({ success: true, sessionId: activeSession });
+  } else {
+    res.json({ success: false, message: 'Aucune session active.' });
+  }
+});
+
+// Efface la session active
+app.post('/api/session/clear', (req, res) => {
+  console.log(`[Session] Session effacée : ${activeSession}`);
+  activeSession = null;
+  res.json({ success: true });
+});
+
+// WebSocket
 io.on('connection', (socket) => {
   let currentRoom = null;
   let userRole = null;
 
-  console.log(`[Socket.IO] New connection: ${socket.id}`);
+  console.log(`[Socket.IO] Nouvelle connexion : ${socket.id}`);
 
-  // User joins a communication room
   socket.on('join-room', ({ sessionId, role }) => {
     currentRoom = sessionId;
     userRole = role;
-
     socket.join(sessionId);
-    console.log(`[Socket.IO] User ${socket.id} (${role}) joined room: ${sessionId}`);
+    console.log(`[Socket.IO] ${socket.id} (${role}) a rejoint : ${sessionId}`);
 
-    // Notify others in the room
     socket.to(sessionId).emit('system-message', {
       type: 'status',
       sender: 'system',
-      text: `${role === 'deaf' ? 'L\'interlocuteur Sourd' : 'L\'interlocuteur Entendant'} a rejoint la conversation.`,
+      text: `${role === 'deaf' ? "L'interlocuteur Sourd" : "L'interlocuteur Entendant"} a rejoint la conversation.`,
       timestamp: Date.now()
     });
   });
 
-  // Handle Speech messages from B (Hearing User)
   socket.on('speech-message', (data) => {
     if (currentRoom) {
-      console.log(`[Speech] In room ${currentRoom}: "${data.text}"`);
-      // Broadcast to everyone in the room (including sender to confirm delivery)
+      console.log(`[Speech] Room ${currentRoom} : "${data.text}"`);
       io.to(currentRoom).emit('chat-message', {
         type: 'speech',
         sender: 'hearing_user',
@@ -59,11 +75,9 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle Gesture messages from A / Smart Glasses (Deaf User)
   socket.on('gesture-message', (data) => {
     if (currentRoom) {
-      console.log(`[Gesture] In room ${currentRoom}: "${data.text}"`);
-      // Broadcast to everyone in the room
+      console.log(`[Gesture] Room ${currentRoom} : "${data.text}"`);
       io.to(currentRoom).emit('chat-message', {
         type: 'gesture',
         sender: 'deaf_user',
@@ -73,16 +87,20 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle disconnection
   socket.on('disconnect', () => {
     if (currentRoom && userRole) {
-      console.log(`[Socket.IO] User ${socket.id} (${userRole}) disconnected from room: ${currentRoom}`);
+      console.log(`[Socket.IO] ${socket.id} (${userRole}) déconnecté de : ${currentRoom}`);
       socket.to(currentRoom).emit('system-message', {
         type: 'status',
         sender: 'system',
-        text: `${userRole === 'deaf' ? 'L\'interlocuteur Sourd' : 'L\'interlocuteur Entendant'} a quitté la conversation.`,
+        text: `${userRole === 'deaf' ? "L'interlocuteur Sourd" : "L'interlocuteur Entendant"} a quitté la conversation.`,
         timestamp: Date.now()
       });
+      // Efface la session si le sourd quitte
+      if (userRole === 'deaf' && activeSession === currentRoom) {
+        activeSession = null;
+        console.log(`[Session] Session ${currentRoom} effacée après déconnexion.`);
+      }
     }
   });
 });
@@ -90,7 +108,7 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`===================================================`);
-  console.log(`🚀 Sourd-Entendant Platform server started!`);
-  console.log(`   Local URL: http://localhost:${PORT}`);
+  console.log(`🚀 Serveur démarré !`);
+  console.log(`   Local : http://localhost:${PORT}`);
   console.log(`===================================================`);
 });
