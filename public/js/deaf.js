@@ -65,7 +65,7 @@ function appendMessage(msg) {
 
   msgEl.innerHTML = `
     <div class="sender-info">
-      ${isDeaf ? '🤟 Lunettes (Moi)' : '🗣 Voix (B)'}
+      ${isDeaf ? ' Lunettes (Moi)' : '🗣 Voix (B)'}
     </div>
     <div>${escapeHtml(msg.text)}</div>
     <span class="time">${time}</span>
